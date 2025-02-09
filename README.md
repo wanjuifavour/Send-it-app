@@ -69,16 +69,31 @@ A modern parcel delivery management system that allows users to create and track
  ┃ ┃ 
  ┃ ┗ 📜 package.json
  ┣ 📂 backend
- ┃ ┣ 📂 src
- ┃ ┃ ┣ 📂 controllers
- ┃ ┃ ┣ 📂 routes
- ┃ ┃ ┣ 📂 middleware
- ┃ ┃ ┣ 📂 services
- ┃ ┃ ┣ 📂 utils
- ┃ ┃ ┣ 📂 database
- ┃ ┃   ┣ 📂 helpers
- ┃ ┃   ┗ 📂 stored-procedures
- ┃ ┃ 
- ┃ ┗ 📜 package.json
+ ┃ ┃
+ ┃ ┣ 📂 config
+ ┃ ┣ ┗ 📜 database.js
+ ┃ ┃
+ ┃ ┣ 📂 Controllers 
+ ┃ ┃ ┣ 📜 parcelController.js
+ ┃ ┃ ┗ 📜 userController.js
+ ┃ ┃
+ ┃ ┣ 📂 middlewares
+ ┃ ┃   ┣ 📜 auth.js
+ ┃ ┃   ┣ 📜 errorHandler.js
+ ┃ ┃   ┗ 📜 validation.js
+ ┃ ┃
+ ┃ ┣ 📂 routes
+ ┃ ┃   ┣ 📜 parcelRoutes.js
+ ┃ ┃   ┗ 📜 userRoutes.js
+ ┃ ┃
+ ┃ ┣ 📂 services
+ ┃ ┃   ┣ 📜 emailQueue.js
+ ┃ ┃   ┗ 📜 emailService.js
+ ┃ ┃
+ ┃ ┣ 📜 .env
+ ┃ ┃
+ ┃ ┣ 📜 package.json
+ ┃ ┃
+ ┃ ┗ 📜 server.js
  ┗ 📜 README.md
 ```
