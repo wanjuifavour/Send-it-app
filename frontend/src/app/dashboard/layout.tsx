@@ -50,6 +50,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <i className="fas fa-cog"></i>
                 <span>Settings</span>
               </Link>
+              <div>
+              <button className="view-all-btn">Logout</button>
+              </div>
             </div>
           </nav>
         </aside>
@@ -74,10 +77,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <span className="user-role">Admin</span>
                 </div>
               </div>
-              <button className="logout-btn">
-                <i className="fas fa-sign-out-alt"></i>
-                <span>Logout</span>
-              </button>
             </div>
           </header>
   
