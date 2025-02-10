@@ -74,7 +74,7 @@ export default function Dashboard() {
                   </td>
                   <td>2024-02-09</td>
                   <td>
-                    <button className="action-btn">
+                    <button className="action-btn" title="View Details">
                       <i className="fas fa-eye"></i>
                     </button>
                   </td>

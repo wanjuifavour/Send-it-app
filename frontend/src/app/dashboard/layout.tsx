@@ -10,7 +10,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <i className="fas fa-shipping-fast"></i>
               <span>SendIt</span>
             </div>
-            <button id="sidebarToggle" className="toggle-btn">
+            <button id="sidebarToggle" className="toggle-btn" title="Toggle Sidebar">
               <i className="fas fa-bars"></i>
             </button>
           </div>
