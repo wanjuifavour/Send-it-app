@@ -15,7 +15,7 @@ export function middleware(request: MiddlewareRequest) {
     const isAuthPage = request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/register");
 
     if (!token && !isAuthPage) {
-        return NextResponse.redirect(new URL("/login", request.url));
+        return NextResponse.redirect(new URL("/", request.url));
     }
 
     if (token && isAuthPage) {

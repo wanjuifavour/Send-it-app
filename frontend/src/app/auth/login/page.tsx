@@ -5,8 +5,8 @@ import '../../auth.css';
 import { useToast } from "@/hooks/use-toast"
 import { login } from "@/services/api"
 import { useState } from "react"
-import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
+import { AxiosError } from "axios"
 import { useStore } from "@/store/useStore"
 import { User } from "@/types/types"
 
