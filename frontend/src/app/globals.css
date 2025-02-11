@@ -20,7 +20,7 @@ body {
   color: var(--white);
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 .navbar {

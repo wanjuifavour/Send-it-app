@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import '../../auth.css';
+import Image from "next/image";
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { AxiosError } from "axios"
@@ -55,10 +56,7 @@ export default function Register() {
     <div className="container">
       <div className="auth-box">
         <div className="logo">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="8" fill="#ff5722" />
-            <path d="M12 20h16M20 12v16" stroke="white" strokeWidth="4" strokeLinecap="round" />
-          </svg>
+          <Image src="/delivery.png" width={90} height={90} alt="Logo" />
         </div>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
@@ -70,9 +68,7 @@ export default function Register() {
           <div className="input-group">
             <input type="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-          <div className="input-group">
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-          </div>
+          
           <button type="submit" className="auth-button">Register</button>
         </form>
         <div className="switch-auth">

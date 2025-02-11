@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import '../../auth.css';
+import Image from "next/image";
 import { useToast } from "@/hooks/use-toast"
 import { login } from "@/services/api"
 import { useState } from "react"
@@ -54,12 +55,9 @@ export default function Login() {
   return (
     <div className="container">
       <div className="auth-box">
-        <div className="logo">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <rect width="40" height="40" rx="8" fill="#ff5722" />
-            <path d="M12 20h16M20 12v16" stroke="white" strokeWidth="4" strokeLinecap="round" />
-          </svg>
-        </div>
+      <div className="logo">
+        <Image src="/delivery.png" width={90} height={90} alt="Logo" />
+      </div>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <input type="email" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
