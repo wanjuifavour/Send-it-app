@@ -26,5 +26,5 @@ export function middleware(request: MiddlewareRequest) {
 }
 
 export const config = {
-    matcher: ["/dashboard/:path*", "/create-order/:path*", "/login", "/register"],
+    matcher: ["/create-order/:path*", "/login", "/register"],
 }
