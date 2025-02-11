@@ -56,7 +56,7 @@ export default function Register() {
     <div className="container">
       <div className="auth-box">
         <div className="logo">
-          <Image src="/delivery.png" width={100} height={90} alt="Logo" />
+          <Image src="/delivery.png" width={100} height={90} alt="Logo" /> 
         </div>
         <form onSubmit={handleSubmit}>
           <div className="input-group">
