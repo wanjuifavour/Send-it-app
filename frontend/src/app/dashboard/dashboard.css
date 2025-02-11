@@ -297,6 +297,25 @@ th {
     color: var(--orange);
 }
 
+.status-badge.pending {
+    background: #fff3e0;
+    color: #ff5722;
+}
+
+.status-badge.in-transit {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-badge.delivered {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-badge.cancelled {
+    background: #ffebee;
+    color: #d32f2f;
+}
 .action-btn {
     background: none;
     border: none;
