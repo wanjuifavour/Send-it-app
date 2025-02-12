@@ -1,100 +1,68 @@
-export default function DeliveryStatus() {
-    return (
-      <div className="dashboard-content">
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-truck"></i>
-            </div>
-            <div className="stat-details">
-              <h3>Total Deliveries</h3>
-              <p className="stat-number">856</p>
-              <span className="stat-trend positive">Today</span>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-clock"></i>
-            </div>
-            <div className="stat-details">
-              <h3>Average Time</h3>
-              <p className="stat-number">2.5h</p>
-              <span className="stat-trend">Per Delivery</span>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <i className="fas fa-check-circle"></i>
-            </div>
-            <div className="stat-details">
-              <h3>On-Time Rate</h3>
-              <p className="stat-number">95%</p>
-              <span className="stat-trend positive">+2.3%</span>
-            </div>
+import { Truck, MapPin } from 'lucide-react';
+
+export default function DeliveryPage() {
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold">Delivery Status</h1>
+        <div className="flex space-x-4">
+          <select className="border rounded-lg px-4 py-2">
+            <option>All Drivers</option>
+            <option>Active Drivers</option>
+            <option>Off Duty</option>
+          </select>
+          <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
+            Assign Delivery
+          </button>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-medium mb-4">Active Deliveries</h2>
+          <div className="space-y-4">
+            {[1, 2, 3].map((delivery) => (
+              <div key={delivery} className="flex items-center justify-between p-4 border rounded-lg">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-emerald-100 p-2 rounded-full">
+                    <Truck className="h-6 w-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="font-medium">Driver #{delivery}</div>
+                    <div className="text-sm text-gray-500">5 packages remaining</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <MapPin className="h-5 w-5 text-gray-400" />
+                  <span className="text-sm">Downtown Area</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-  
-        <div className="content-card mt-6">
-          <div className="card-header">
-            <h2>Active Deliveries</h2>
-            <button className="view-all-btn">Refresh</button>
-          </div>
-          <div className="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Driver</th>
-                  <th>Vehicle</th>
-                  <th>Current Location</th>
-                  <th>Deliveries Left</th>
-                  <th>Status</th>
-                  <th>ETA</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  {
-                    driver: 'John Smith',
-                    vehicle: 'Van-001',
-                    location: 'Downtown',
-                    deliveries: 5,
-                    status: 'On Route',
-                    eta: '30 min'
-                  },
-                  {
-                    driver: 'Sarah Wilson',
-                    vehicle: 'Van-002',
-                    location: 'Suburbs',
-                    deliveries: 3,
-                    status: 'On Route',
-                    eta: '45 min'
-                  },
-                  {
-                    driver: 'Mike Johnson',
-                    vehicle: 'Van-003',
-                    location: 'Airport Area',
-                    deliveries: 7,
-                    status: 'Loading',
-                    eta: '15 min'
-                  }
-                ].map((delivery, index) => (
-                  <tr key={index}>
-                    <td>{delivery.driver}</td>
-                    <td>{delivery.vehicle}</td>
-                    <td>{delivery.location}</td>
-                    <td>{delivery.deliveries}</td>
-                    <td>
-                      <span className={`status-badge ${delivery.status.toLowerCase().replace(' ', '-')}`}>
-                        {delivery.status}
-                      </span>
-                    </td>
-                    <td>{delivery.eta}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-medium mb-4">Delivery Statistics</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 border rounded-lg">
+              <div className="text-sm text-gray-500">On Time Delivery</div>
+              <div className="text-2xl font-semibold">94.8%</div>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="text-sm text-gray-500">Average Time</div>
+              <div className="text-2xl font-semibold">2.5 hrs</div>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="text-sm text-gray-500">Active Drivers</div>
+              <div className="text-2xl font-semibold">12</div>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <div className="text-sm text-gray-500">Total Routes</div>
+              <div className="text-2xl font-semibold">8</div>
+            </div>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}

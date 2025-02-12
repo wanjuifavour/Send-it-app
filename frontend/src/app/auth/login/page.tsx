@@ -1,78 +1,65 @@
-"use client"
-
-import Link from 'next/link';
-import '../../auth.css';
 import Image from "next/image";
-import { useToast } from "@/hooks/use-toast"
-import { login } from "@/services/api"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { AxiosError } from "axios"
-import { useStore } from "@/store/useStore"
-import { User } from "@/types/types"
+import Link from "next/link";
 
 export default function Login() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const { setUser } = useStore()
-  const router = useRouter()
-  const { toast } = useToast()
-
-  interface LoginResponse {
-    user: User;
-    token: string;
-  }
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    try {
-      const data: LoginResponse = await login(email, password);
-      setUser(data.user);
-      document.cookie = `token=${data.token}; path=/; max-age=3600`;
-      router.push("/dashboard");
-    }
-    catch (error) {
-      let errorMessage = "Something went wrong";
-      if (error instanceof AxiosError && error.response) {
-        errorMessage = error.response.data?.message || errorMessage;
-        if (!error.response.data?.message) {
-          if (error.response.status === 404) {
-            errorMessage = "User does not exist";
-          } else if (error.response.status === 401) {
-            errorMessage = "Invalid password";
-          }
-        }
-      }
-
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    }
-  };
-
   return (
-    <div className="container">
-      <div className="auth-box">
-      <div className="logo">
-        <Image src="/delivery.png" width={100} height={90} alt="Logo" /> 
-      </div>
-        <form onSubmit={handleSubmit}>
-          <div className="input-group">
-            <input type="email" id="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-          <div className="input-group">
-            <input type="password" id="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          </div>
-          <div className="forgot-password">
-            <Link href="/forgot-password">Forgot Password?</Link>
-          </div>
-          <button type="submit" className="auth-button"> Login </button>
-        </form>
-        <div className="switch-auth">
-          <p>Don&apos;t have an account? <Link href="/auth/register">Register</Link></p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/delivery.png"
+            alt="Delivery Logo"
+            width={150}
+            height={40}
+            className="h-10 w-auto"
+          />
         </div>
+
+        <form className="space-y-6">
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+
+            />
+          </div>
+
+          <div>
+            <input
+              type="password"
+              placeholder="Password?"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <Link
+              href="/auth/forgot-password"
+              className="text-gray-500 hover:text-gray-700 text-sm"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 px-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+          >
+            Login
+          </button>
+        </form>
+
+        <p className="mt-8 text-center text-gray-600">
+          Don't have an account?{" "}
+          <Link
+            href="/auth/register"
+            className="text-orange-500 hover:text-orange-600"
+          >
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   );

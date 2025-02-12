@@ -40,7 +40,7 @@ exports.adminCreateParcel = async (req, res) => {
         const parcelId = result.recordset[0].id
         res.status(201).json({ message: "Parcel created by admin successfully", parcelId })
     } catch (error) {
-        res.status(403).json({ message: "Admin privileges required", error: error.message })
+        res.status(403).json({ message: "Admin privileges ", error: error.message })
     }
 }
 
