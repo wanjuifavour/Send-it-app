@@ -17,9 +17,11 @@ exports.signup = async (req, res) => {
             username,
             email,
             password: hashedPassword,
+            isAdmin: false
         })
 
         const userId = result.recordset[0].id
+        const isAdmin = result.recordset[0].isAdmin
 
         const token = jwt.sign(
             { userId },
@@ -34,7 +36,7 @@ exports.signup = async (req, res) => {
                 id: userId,
                 email,
                 username,
-                isAdmin
+                isAdmin: isAdmin
             }
         })
 

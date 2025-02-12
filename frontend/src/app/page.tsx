@@ -12,7 +12,7 @@ export default function Home() {
           <a href="#faqs" className="hover:text-gray-200">FAQs</a>
         </div>
         <div className="flex items-center space-x-4">
-          <a href="/auth/signup" className="text-white hover:text-gray-200">Sign Up</a>
+          <a href="/auth/register" className="text-white hover:text-gray-200">Sign Up</a>
           <a href="/auth/login" className="bg-white text-emerald-600 px-6 py-2 rounded-full hover:bg-gray-100 text-sm">Login</a>
         </div>
       </nav>
