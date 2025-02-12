@@ -1,7 +1,16 @@
+"use client"
+
 import Link from 'next/link';
 import { BarChart, Package, Map, Users, Truck, Settings } from 'lucide-react';
+import { useStore } from "@/store/useStore"
 
 export function Sidebar() {
+  const { setUser } = useStore()
+  const logoutUser = () => {
+    setUser(null)
+    document.cookie = "token=; path=/; max-age=0";
+    window.location.href = "/";
+  }
   return (
     <div className="w-64 bg-[#2E8B57] text-white flex flex-col">
       <div className="p-4">
@@ -10,7 +19,7 @@ export function Sidebar() {
           <span className="text-xl font-bold">SendIt</span>
         </Link>
       </div>
-      
+
       <nav className="flex-1 px-4 space-y-1">
         <div className="py-4">
           <h2 className="text-xs uppercase tracking-wider text-green-200">General</h2>
@@ -50,6 +59,11 @@ export function Sidebar() {
               Settings
             </Link>
           </div>
+        </div>
+        <div className="mt-auto p-4">
+          <button onClick={logoutUser} className="w-full py-2 px-4 bg-red-600 text-white rounded">
+            Logout
+          </button>
         </div>
       </nav>
     </div>
