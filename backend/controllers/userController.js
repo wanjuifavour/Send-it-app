@@ -20,28 +20,29 @@ exports.signup = async (req, res) => {
         })
 
         const userId = result.recordset[0].id
-        
+
         const token = jwt.sign(
             { userId },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         )
 
-        res.status(201).json({ 
+        res.status(201).json({
             message: "User created successfully",
             token,
             user: {
                 id: userId,
                 email,
-                username
+                username,
+                isAdmin
             }
         })
 
         await sendWelcomeEmail(email, username)
     } catch (error) {
-        res.status(500).json({ 
-            message: "Error creating user", 
-            error: error.message 
+        res.status(500).json({
+            message: "Error creating user",
+            error: error.message
         })
     }
 }
@@ -72,10 +73,51 @@ exports.login = async (req, res) => {
             user: {
                 id: user.id,
                 email: user.email,
-                username: user.username
+                username: user.username,
+                isAdmin: user.isAdmin
             }
         })
     } catch (error) {
         res.status(500).json({ message: "Login error", error: error.message })
+    }
+}
+
+exports.createAdmin = async (req, res) => {
+    const { username, email, password } = req.body
+
+    try {
+        const existingUser = await executeStoredProcedure("sp_GetUserByEmail", { email })
+        if (existingUser.recordset.length > 0) {
+            return res.status(409).json({ message: "Email already exists" })
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10)
+        const result = await executeStoredProcedure("sp_CreateUser", {
+            username,
+            email,
+            password: hashedPassword,
+            isAdmin: true
+        })
+
+        const userId = result.recordset[0].id
+
+        const token = jwt.sign(
+            { userId },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        )
+
+        res.status(201).json({
+            message: "Admin created successfully",
+            token,
+            user: {
+                id: userId,
+                email,
+                username,
+                isAdmin
+            }
+        })
+    } catch (error) {
+        res.status(500).json({ message: "Error creating admin", error: error.message })
     }
 }
