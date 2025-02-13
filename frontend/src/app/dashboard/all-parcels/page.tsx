@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Package, Search, Filter } from "lucide-react";
+import { AddParcelModal } from "@/components/parcels/AddParcelModal"
 
 const parcels = Array.from({ length: 13 }, (_, i) => ({
   id: i + 1,
@@ -21,15 +22,21 @@ export default function AllParcelsPage() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">All Parcels</h1>
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+        >
           Add New Parcel
         </button>
       </div>
+
+      <AddParcelModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
       <div className="bg-white rounded-lg shadow">
         <div className="p-4 border-b flex items-center justify-between">

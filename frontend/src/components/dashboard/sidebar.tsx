@@ -60,7 +60,7 @@ export function Sidebar({ onClose }: SidebarProps) {
                   My Parcels
                 </Link>
               )}
-              <Link href="/dashboard/track" onClick={handleLinkClick} className={getLinkClass('/dashboard/track')}>
+              <Link href="/dashboard/track" onClick={handleLinkClick} className={getLinkClass('/dashboard/tperk')}>
                 <Map className="h-5 w-5 mr-3" />
                 Track Parcel
               </Link>

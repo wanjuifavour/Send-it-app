@@ -7,13 +7,12 @@ const {
     adminCreateParcel,
     softDeleteParcel,
 } = require("../controllers/parcelController")
-const auth = require("../middlewares/auth")
 const { validateParcelCreation } = require("../middlewares/validation")
 
-router.post("/upsert", auth, validateParcelCreation, upsertParcel)
-router.post("/admin/create", auth, validateParcelCreation, adminCreateParcel)
-router.put("/:id/status", auth, updateParcelStatus)
-router.get("/", auth, getParcels)
-router.delete("/:id", auth, softDeleteParcel)
+router.post("/upsert", validateParcelCreation, upsertParcel)
+router.post("/admin/create", validateParcelCreation, adminCreateParcel)
+router.put("/:id/status", updateParcelStatus)
+router.get("/", getParcels)
+router.delete("/:id", softDeleteParcel)
 
 module.exports = router

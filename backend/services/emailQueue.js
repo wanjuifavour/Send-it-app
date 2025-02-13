@@ -4,7 +4,12 @@ const dotenv = require("dotenv")
 
 dotenv.config()
 
-const emailQueue = new Queue("email-queue", process.env.REDIS_URL)
+const emailQueue = new Queue("email-queue", {
+    redis: {
+        host: process.env.REDIS_HOST || 'localhost',
+        port: process.env.REDIS_PORT || 6379,
+    }
+})
 
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
@@ -20,7 +25,7 @@ emailQueue.process(async (job) => {
 
     try {
         await transporter.sendMail({
-            from: '"Send-It App" <noreply@sendit.com>',
+            from: '"Send-It App" kazihub.official@gmail.com',
             to,
             subject,
             html,
@@ -31,5 +36,13 @@ emailQueue.process(async (job) => {
         throw error
     }
 })
+
+emailQueue.on('completed', (job) => {
+    console.log(`Email job ${job.id} completed`);
+});
+
+emailQueue.on('failed', (job, err) => {
+    console.error(`Email job ${job.id} failed:`, err);
+});
 
 module.exports = emailQueue
