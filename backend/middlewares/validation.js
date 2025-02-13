@@ -31,9 +31,10 @@ exports.validateParcelCreation = (req, res, next) => {
     const schema = Joi.object({
         senderId: Joi.number().required(),
         receiverId: Joi.number().required(),
-        pickupLocation: Joi.string().required(),
+        senderLocation: Joi.string().required(),
         destination: Joi.string().required(),
         weight: Joi.number().positive().required(),
+        adminId: Joi.number().required()
     })
 
     const { error } = schema.validate(req.body)

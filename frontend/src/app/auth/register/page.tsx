@@ -62,7 +62,7 @@ export default function Register() {
             />
           </div>
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-6" onSubmit= {handleSubmit}>
             <div>
               <input
                 type="text"
