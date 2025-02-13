@@ -1,52 +1,12 @@
-"use client";
-
 import { Package, MapPin, Clock, CheckCircle, Truck } from 'lucide-react';
-import { useEffect } from 'react';
 
 export default function TrackPage() {
-  useEffect(() => {
-    const initMap = () => {
-      const mapElement = document.getElementById("map") as HTMLElement;
-      const map = new google.maps.Map(mapElement, {
-        zoom: 7,
-        center: { lat: -1.286389, lng: 36.817223 },
-      });
-
-      const directionsService = new google.maps.DirectionsService();
-      const directionsRenderer = new google.maps.DirectionsRenderer();
-      directionsRenderer.setMap(map);
-
-      directionsService.route(
-        {
-          origin: "Nyeri, Kenya",
-          destination: "Mumbi, Kenya",
-          travelMode: google.maps.TravelMode.DRIVING,
-        },
-        (response, status) => {
-          if (status === "OK") {
-            directionsRenderer.setDirections(response);
-          } else {
-            console.error("Directions request failed due to " + status);
-          }
-        }
-      );
-    };
-
-    if (window.google) {
-      initMap();
-    } else {
-      const script = document.createElement("script");
-      script.src = `https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap`;
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
-
   return (
-    <div className="grid grid-cols-4 gap-6 h-screen p-6">
-      <div className="col-span-1 space-y-6">
-        <h1 className="text-2xl font-semibold">Track Parcel</h1>
-        <div className="bg-white rounded-lg shadow p-6">
+    <div className="space-y-6">
+      <h1 className="text-2xl font-semibold">Track Parcel</h1>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="max-w-xl mx-auto space-y-6">
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">Enter Tracking Number</label>
             <div className="flex space-x-4">
@@ -72,8 +32,9 @@ export default function TrackPage() {
                 { status: 'Delivered', date: 'Pending', icon: CheckCircle, completed: false }
               ].map((step, index) => (
                 <div key={index} className="relative flex items-start">
-                  <div className={`absolute left-8 -translate-x-1/2 w-4 h-4 rounded-full border-2 ${step.completed ? 'bg-emerald-600 border-emerald-600' : 'bg-white border-gray-300'
-                    }`}></div>
+                  <div className={`absolute left-8 -translate-x-1/2 w-4 h-4 rounded-full border-2 ${
+                    step.completed ? 'bg-emerald-600 border-emerald-600' : 'bg-white border-gray-300'
+                  }`}></div>
                   <div className="ml-12">
                     <div className="font-medium">{step.status}</div>
                     <div className="text-sm text-gray-500">{step.date}</div>
@@ -84,8 +45,27 @@ export default function TrackPage() {
           </div>
         </div>
       </div>
-      <div className="col-span-3">
-        <div id="map" className="w-full h-full bg-gray-200 rounded-lg shadow"></div>
+
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-lg font-medium mb-4">Parcel Details</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 className="text-sm font-medium text-gray-500">Sender Information</h3>
+            <div className="mt-2 space-y-1">
+              <p className="text-sm">James Kimaethi</p>
+              <p className="text-sm">123 Sender Street</p>
+              <p className="text-sm">Nyeri, NY 10001</p>
+            </div>
+          </div>
+          <div>
+            <h3 className="text-sm font-medium text-gray-500">Recipient Information</h3>
+            <div className="mt-2 space-y-1">
+              <p className="text-sm">Jane Kioko</p>
+              <p className="text-sm">456 Receiver Road</p>
+              <p className="text-sm">Mumbi, CA 90001</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
