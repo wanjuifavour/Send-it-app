@@ -1,32 +1,75 @@
 "use client";
 
-import { useState } from "react";
-import { Users, Search, Filter, MoreVertical } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast"
+import { Users, Search, Filter, Trash2  } from "lucide-react";
+import { useStore } from "@/store/useStore";
+import { getUsers, deleteUser } from "@/services/api";
+import { CreateUserModal } from "@/components/users/CreateUserModal";
+import { DeleteConfirmationModal } from "@/components/users/DeleteConfirmationModal"
 
-const users = Array.from({ length: 12 }, (_, i) => ({
-  id: i + 1,
-  name: `User ${i + 1}`,
-  email: `user${i + 1}@example.com`,
-  role: "Admin",
-  status: "Active",
-  lastActive: `${Math.floor(Math.random() * 10) + 1} hours ago`,
-}));
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  isAdmin?: boolean;
+  createdAt: string;
+}
 
 const itemsPerPage = 5;
 
 export default function UsersPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1);
+  const [users, setUsers] = useState<User[]>([]);
+  const { user } = useStore();
+  const { toast } = useToast()
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (user?.isAdmin) {
+        const data = await getUsers();
+        setUsers(data);
+      }
+    };
+    fetchUsers();
+  }, [user]);
+
   const totalPages = Math.ceil(users.length / itemsPerPage);
   const paginatedUsers = users.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  const handleDelete = async () => {
+    if (!selectedUserId) return
+
+    try {
+      await deleteUser(selectedUserId)
+      toast({ title: "Success", description: "User deleted successfully" })
+      const data = await getUsers()
+      setUsers(data)
+      setDeleteModalOpen(false)
+    } catch (error: unknown) {
+      toast({
+        title: "Error", 
+        description: error instanceof Error ? error.message : "Failed to delete user",
+        variant: "destructive"
+      })
+    }
+  }
+
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">Manage Users</h1>
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+        >
           Add New User
         </button>
       </div>
@@ -42,7 +85,7 @@ export default function UsersPage() {
             <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
           </div>
           <div className="flex items-center space-x-4">
-            <select 
+            <select
               className="border rounded-lg px-4 py-2"
               aria-label="Filter by role"
             >
@@ -72,7 +115,7 @@ export default function UsersPage() {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Last Active
+                  Created
                 </th>
                 <th className="relative px-6 py-3">
                   <span className="sr-only">Actions</span>
@@ -88,28 +131,36 @@ export default function UsersPage() {
                         <Users className="h-5 w-5 text-emerald-600" />
                       </div>
                       <div className="ml-4">
-                        <div className="text-sm font-medium">{user.name}</div>
+                        <div className="text-sm font-medium">{user.username}</div>
                         <div className="text-sm text-gray-500">{user.email}</div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-emerald-100 text-emerald-800">
-                      {user.role}
+                      {user.isAdmin ? 'Admin' : 'User'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      {user.status}
+                      Active
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.lastActive}
+                    {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button className="text-gray-400 hover:text-gray-500">
-                      <MoreVertical className="h-5 w-5" />
-                    </button>
+                    <div className="relative">
+                      <button
+                        onClick={() => {
+                          setSelectedUserId(user.id)
+                          setDeleteModalOpen(true)
+                        }}
+                        className="text-gray-400 hover:text-gray-500"
+                      >
+                        <Trash2  className="h-5 w-5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -142,6 +193,20 @@ export default function UsersPage() {
           </div>
         </div>
       </div>
+
+      <CreateUserModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUserCreated={() => {
+          getUsers().then(data => setUsers(data))
+        }}
+      />
+
+      <DeleteConfirmationModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+        onConfirm={handleDelete}
+      />
     </div>
   );
 }

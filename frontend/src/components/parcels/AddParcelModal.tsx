@@ -77,14 +77,6 @@ export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
     }
   }, [isOpen, toast]);
 
-  const filteredUsers = (searchTerm: string) => {
-    if (!searchTerm.trim()) return users;
-
-    const term = searchTerm.toLowerCase();
-    return users.filter(user =>
-      user?.username?.toLowerCase().includes(term)
-    );
-  };
 
   const filteredLocations = (searchTerm: string) => {
     if (!locations) return [];
@@ -92,14 +84,6 @@ export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
       location?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
-
-  const handleUserSelect = (user: User, type: 'sender' | 'receiver') => {
-    const fieldId = type === 'sender' ? 'senderId' : 'receiverId';
-    setFormData(prev => ({
-      ...prev,
-      [fieldId]: user.id.toString()
-    }));
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -113,7 +97,7 @@ export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
         adminId: user?.id
       }
 
-      const response = await createParcel(parcelData)
+      await createParcel(parcelData)
       toast({
         title: "Success",
         description: "Parcel created successfully",
@@ -121,8 +105,9 @@ export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
       })
       onClose()
     } catch (error) {
+      console.error('Create Parcel Error:', error);
       toast({
-        title: "Error",
+        title: "Error", 
         description: "Failed to create parcel",
         variant: "destructive",
       })

@@ -23,6 +23,18 @@ exports.signup = async (req, res) => {
         const userId = result.recordset[0].id
         const isAdmin = result.recordset[0].isAdmin
 
+        if (req.headers.authorization) {
+            return res.status(201).json({ 
+                message: "User created successfully",
+                // user: {
+                //     id: userId,
+                //     email,
+                //     username,
+                //     isAdmin: isAdmin
+                // }
+            })
+        }
+
         const token = jwt.sign(
             { userId },
             process.env.JWT_SECRET,
@@ -146,7 +158,9 @@ exports.getAllUsers = async (req, res) => {
         const users = userRecords.map(user => ({
             id: user.id,
             username: user.username,
-            email: user.email
+            email: user.email,
+            isAdmin: user.isAdmin,
+            createdAt: user.createdAt
         }));
         
         // console.log('Mapped users:', users);
@@ -158,5 +172,23 @@ exports.getAllUsers = async (req, res) => {
             message: "Error fetching users", 
             error: error.message 
         });
+    }
+}
+
+exports.deleteUser = async (req, res) => {
+    try {
+        const userId = req.params.userId
+        await executeStoredProcedure("sp_DeleteUser", { userId })
+        
+        res.json({
+            message: "User deleted successfully",
+            deletedUserId: userId
+        })
+    } catch (error) {
+        console.error('Error deleting user:', error)
+        res.status(500).json({
+            message: "Error deleting user",
+            error: error.message
+        })
     }
 }
