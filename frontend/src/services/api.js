@@ -37,7 +37,7 @@ export const getParcels = async () => {
 }
 
 export const createParcel = async (parcelData) => {
-    const response = await api.post("/parcels", parcelData)
+    const response = await api.post("/parcels/admin/create", parcelData)
     return response.data
 }
 
@@ -50,5 +50,15 @@ export const updateParcelStatus = async (parcelId, status) => {
     const response = await api.put(`/admin/parcels/${parcelId}/status`, { status })
     return response.data
 }
+
+export const getLocations = async () => {
+    const response = await api.get("/locations/get");
+    return response.data;
+};
+
+export const getUsers = async () => {
+    const response = await api.get("/users/getusers");
+    return response.data.users;
+};
 
 export default api
