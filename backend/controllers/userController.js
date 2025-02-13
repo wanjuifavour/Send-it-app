@@ -102,6 +102,7 @@ exports.createAdmin = async (req, res) => {
         })
 
         const userId = result.recordset[0].id
+        const isAdmin = result.recordset[0].isAdmin
 
         const token = jwt.sign(
             { userId },
@@ -116,10 +117,29 @@ exports.createAdmin = async (req, res) => {
                 id: userId,
                 email,
                 username,
-                isAdmin
+                isAdmin: isAdmin
             }
         })
     } catch (error) {
         res.status(500).json({ message: "Error creating admin", error: error.message })
+    }
+}
+
+exports.getAllUsers = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = parseInt(req.query.pageSize) || 100;
+        
+        const result = await executeStoredProcedure("sp_GetAllUsers", {
+            page,
+            pageSize
+        });
+        
+        res.json({
+            users: result.recordset,
+            totalUsers: result.recordset[0]?.totalUsers || 0
+        });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching users", error: error.message });
     }
 }

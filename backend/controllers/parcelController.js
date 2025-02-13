@@ -1,14 +1,14 @@
 const { executeStoredProcedure } = require("../config/database")
 
 exports.upsertParcel = async (req, res) => {
-    const { id, senderId, receiverId, pickupLocation, destination, weight, status } = req.body
+    const { id, senderId, receiverId, senderLocation, destination, weight, status } = req.body
 
     try {
         const result = await executeStoredProcedure("sp_UpsertParcel", {
             id,
             senderId,
             receiverId,
-            pickupLocation,
+            senderLocation,
             destination,
             weight,
             status,
@@ -24,7 +24,7 @@ exports.upsertParcel = async (req, res) => {
 }
 
 exports.adminCreateParcel = async (req, res) => {
-    const { senderId, receiverId, pickupLocation, destination, weight } = req.body
+    const { senderId, receiverId, senderLocation, destination, weight } = req.body
     const adminId = req.userData.userId
 
     try {
@@ -32,7 +32,7 @@ exports.adminCreateParcel = async (req, res) => {
             adminId,
             senderId,
             receiverId,
-            pickupLocation,
+            senderLocation,
             destination,
             weight
         })
@@ -72,7 +72,7 @@ exports.getParcels = async (req, res) => {
 
 exports.softDeleteParcel = async (req, res) => {
     const { id } = req.params
-    
+
     try {
         await executeStoredProcedure("sp_SoftDeleteParcel", {
             id,

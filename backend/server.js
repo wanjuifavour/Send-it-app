@@ -5,6 +5,7 @@ const { connectDB } = require('./config/database');
 const userRoutes = require('./routes/userRoutes');
 const parcelRoutes = require('./routes/parcelRoutes');
 const errorHandler = require('./middlewares/errorHandler');
+const locationRoutes = require("./routes/locationRoutes")
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ connectDB();
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/parcels', parcelRoutes);
+app.use("/api/locations", locationRoutes)
 
 app.get('/', (req, res) => {
     res.send('Welcome to Send-It API');
