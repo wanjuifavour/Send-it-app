@@ -24,8 +24,8 @@ exports.upsertParcel = async (req, res) => {
 }
 
 exports.adminCreateParcel = async (req, res) => {
-    const { senderId, receiverId, senderLocation, destination, weight } = req.body
-    const adminId = req.userData.userId
+    const { senderId, receiverId, senderLocation, destination, weight, adminId } = req.body
+    // const adminId = req.userData.userId
 
     try {
         const result = await executeStoredProcedure("sp_AdminCreateParcel", {

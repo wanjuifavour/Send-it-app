@@ -7,6 +7,7 @@ const api = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
+    // withCredentials: true
 })
 
 api.interceptors.request.use((config) => {
@@ -58,7 +59,8 @@ export const getLocations = async () => {
 
 export const getUsers = async () => {
     const response = await api.get("/users/getusers");
-    return response.data.users;
+    // console.log('API Response:', response.data)
+    return response.data
 };
 
 export default api

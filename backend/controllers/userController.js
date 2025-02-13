@@ -134,12 +134,29 @@ exports.getAllUsers = async (req, res) => {
             page,
             pageSize
         });
+
+        // console.log('Raw result from DB:', result);
+        // console.log('Recordset:', result.recordset);
         
-        res.json({
-            users: result.recordset,
-            totalUsers: result.recordset[0]?.totalUsers || 0
-        });
+        const userRecords = result.recordsets[1];
+        if (!userRecords || userRecords.length === 0) {
+            return res.status(404).json({ message: "No users found" });
+        }
+
+        const users = userRecords.map(user => ({
+            id: user.id,
+            username: user.username,
+            email: user.email
+        }));
+        
+        // console.log('Mapped users:', users);
+        res.json( users );
+        
     } catch (error) {
-        res.status(500).json({ message: "Error fetching users", error: error.message });
+        console.error('Error in getAllUsers:', error);
+        res.status(500).json({ 
+            message: "Error fetching users", 
+            error: error.message 
+        });
     }
 }
