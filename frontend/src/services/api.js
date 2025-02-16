@@ -63,6 +63,15 @@ export const upsertParcel = async (parcelData) => {
     return api.post(`/parcels/upsert`, parcelData)
 }
 
+export const addLocation = async (locationData) => {
+    try {
+        const response = await api.post(`/locations/add`, locationData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || "Failed to add location");
+    }
+};
+
 export const getLocations = async () => {
     const response = await api.get("/locations/get");
     return response.data;
@@ -78,5 +87,10 @@ export const deleteUser = async (userId) => {
     const response = await api.delete(`/users/${userId}`)
     return response.data
 }
+
+export const createStripeSession = async (parcelData) => {
+    const response = await api.post('/create-stripe-session', parcelData);
+    return response.data;
+};
 
 export default api

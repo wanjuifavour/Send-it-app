@@ -1,4 +1,6 @@
-export function RecentParcels() {
+import { Parcel } from "@/app/dashboard/all-parcels/page"
+
+export function RecentParcels({ parcels }: { parcels: Parcel[] }) {
     return (
       <div className="bg-white rounded-lg shadow">
         <div className="flex items-center justify-between p-6">
@@ -32,6 +34,31 @@ export function RecentParcels() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
+              {parcels.map(parcel => (
+                <tr key={parcel.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    {parcel.trackingId}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {parcel.senderName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    {parcel.receiverName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      parcel.status === 'In Transit' 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {parcel.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {new Date(parcel.createdAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
