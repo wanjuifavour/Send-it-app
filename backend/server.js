@@ -6,6 +6,7 @@ const userRoutes = require('./routes/userRoutes');
 const parcelRoutes = require('./routes/parcelRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const locationRoutes = require("./routes/locationRoutes")
+const smsRoutes = require("./routes/smsRoutes");
 
 dotenv.config();
 
@@ -34,3 +35,5 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 8085;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.use("/api/sms", smsRoutes);
