@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { Menu } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { TopNav } from '@/components/dashboard/top-nav';
-import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
@@ -12,7 +12,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const pathname = usePathname();
 
   const closeSidebar = () => {
     setSidebarOpen(false);
