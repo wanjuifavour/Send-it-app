@@ -1,71 +1,56 @@
-import { Package, MapPin, Clock, CheckCircle, Truck } from 'lucide-react';
+"use client"
+
+import { StatsCard } from '@/components/dashboard/stats-card';
+import MapWrapper from '@/components/dashboard/MapWrapper';
+import { MapPin } from 'lucide-react';
+import { useStore } from '@/store/useStore';
 
 export default function TrackPage() {
+  const { user } = useStore();
+  const locations = [
+    {
+      coords: [51.505, -0.09] as [number, number],
+      popupContent: `
+            <h3 class="font-bold text-lg">London</h3>
+            <p class="text-sm">Capital of England</p>
+        `
+    },
+    {
+      coords: [48.8566, 2.3522] as [number, number],
+      popupContent: `
+            <h3 class="font-bold text-lg">Paris</h3>
+            <p class="text-sm">Capital of France</p>
+        `
+    }
+  ];
+
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">Track Parcel</h1>
-
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="max-w-xl mx-auto space-y-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Enter Tracking Number</label>
-            <div className="flex space-x-4">
-              <input
-                type="text"
-                placeholder="e.g., TRK-123456789"
-                className="flex-1 rounded-lg border focus:ring-2 focus:ring-emerald-500 px-4 py-2"
-              />
-              <button className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700">
-                Track
-              </button>
-            </div>
-          </div>
-
-          <div className="relative pt-8">
-            <div className="absolute top-0 left-8 h-full w-0.5 bg-gray-200"></div>
-            <div className="space-y-8">
-              {[
-                { status: 'Order Placed', date: '2025-02-12 09:00 AM', icon: Package, completed: true },
-                { status: 'Picked Up', date: '2025-02-12 11:30 AM', icon: MapPin, completed: true },
-                { status: 'In Transit', date: '2025-02-12 02:15 PM', icon: Clock, completed: true },
-                { status: 'Out for Delivery', date: '2025-02-12 04:45 PM', icon: Truck, completed: false },
-                { status: 'Delivered', date: 'Pending', icon: CheckCircle, completed: false }
-              ].map((step, index) => (
-                <div key={index} className="relative flex items-start">
-                  <div className={`absolute left-8 -translate-x-1/2 w-4 h-4 rounded-full border-2 ${
-                    step.completed ? 'bg-emerald-600 border-emerald-600' : 'bg-white border-gray-300'
-                  }`}></div>
-                  <div className="ml-12">
-                    <div className="font-medium">{step.status}</div>
-                    <div className="text-sm text-gray-500">{step.date}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+    <div className="h-screen flex flex-col p-4">
+      {/* Top section - 40% height */}
+      <div className="h-2/8 flex flex-col space-y-4">
+        <div className="h-full grid grid-cols-1 md:grid-cols-2 gap-4">
+          <StatsCard
+            title="Sender Location"
+            value="Mombasa, Kenya"
+            label="Package dispatched"
+            icon={<MapPin className="h-6 w-6 text-white" />}
+          />
+          <StatsCard
+            title="Destination"
+            value="Nairobi, Kenya"
+            label="Expected delivery soon"
+            icon={<MapPin className="h-6 w-6 text-white" />}
+          />
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-medium mb-4">Parcel Details</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Sender Information</h3>
-            <div className="mt-2 space-y-1">
-              <p className="text-sm">James Kimaethi</p>
-              <p className="text-sm">123 Sender Street</p>
-              <p className="text-sm">Nyeri, NY 10001</p>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-medium text-gray-500">Recipient Information</h3>
-            <div className="mt-2 space-y-1">
-              <p className="text-sm">Jane Kioko</p>
-              <p className="text-sm">456 Receiver Road</p>
-              <p className="text-sm">Mumbi, CA 90001</p>
-            </div>
-          </div>
-        </div>
+      {/* Bottom section - 60% height */}
+      <div className="h-6/8 overflow-hidden">
+        <MapWrapper
+          locations={locations}
+          polyline
+          className="h-full w-full rounded-lg shadow-xl border"
+        />
       </div>
     </div>
   );

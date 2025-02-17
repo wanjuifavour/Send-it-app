@@ -1,7 +1,7 @@
 const { executeStoredProcedure } = require("../config/database")
 
 exports.upsertParcel = async (req, res) => {
-    const { id, senderId, receiverId, senderLocation, destination, weight, status } = req.body
+    const { id, senderId, receiverId, senderLocation, destination, weight } = req.body
 
     try {
         const result = await executeStoredProcedure("sp_UpsertParcel", {
@@ -11,7 +11,7 @@ exports.upsertParcel = async (req, res) => {
             senderLocation,
             destination,
             weight,
-            status,
+            status: 'Pending'
         })
 
         const parcelId = result.recordset[0].id
@@ -81,5 +81,28 @@ exports.softDeleteParcel = async (req, res) => {
         res.json({ message: "Parcel deleted successfully" })
     } catch (error) {
         res.status(500).json({ message: "Error deleting parcel", error: error.message })
+    }
+}
+
+exports.getAllParcels = async (req, res) => {
+    try {
+        const result = await executeStoredProcedure("sp_GetAllParcels", {
+            page: req.query.page || 1,
+            pageSize: req.query.pageSize || 100,
+            status: req.query.status
+        })
+        
+        res.json({
+            total: result.recordsets[0][0].totalParcels,
+            parcels: result.recordsets[1].map(p => ({
+                ...p,
+                senderId: p.senderId,
+                receiverId: p.receiverId,
+                senderLocation: p.senderLocation,
+                destination: p.destination
+            }))
+        })
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching parcels", error: error.message })
     }
 }

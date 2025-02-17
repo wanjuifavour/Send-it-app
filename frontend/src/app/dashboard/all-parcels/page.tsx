@@ -1,28 +1,94 @@
 "use client";
 
-import { useState } from "react";
-import { Package, Search, Filter } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Filter, } from "lucide-react";
 import { AddParcelModal } from "@/components/parcels/AddParcelModal"
+import { getAllParcels, updateParcelStatus, softDeleteParcel } from "@/services/api"
+import { useToast } from "@/hooks/use-toast"
+import { ParcelActionsModal } from "@/components/parcels/ParcelActionsModal"
+import { EditParcelModal } from "@/components/parcels/EditParcelModal"
 
-const parcels = Array.from({ length: 13 }, (_, i) => ({
-  id: i + 1,
-  trackingId: `TRK-${i + 1}23456`,
-  sender: "James Kimaethi",
-  recipient: "Jane Kioko",
-  status: "Delivered",
-  date: "2025-02-12",
-}));
+export interface Parcel {
+  id: number
+  trackingId: string
+  senderName: string
+  senderId: number
+  receiverName: string
+  receiverId: number
+  status: string
+  weight: number
+  createdAt: string
+  senderLocation: string
+  destination: string
+}
 
 const itemsPerPage = 5;
 
 export default function AllParcelsPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [parcels, setParcels] = useState<Parcel[]>([])
+  const [selectedParcel, setSelectedParcel] = useState<Parcel | null>(null)
+  const [isActionModalOpen, setIsActionModalOpen] = useState(false)
+  const { toast } = useToast()
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(parcels.length / itemsPerPage);
-  const paginatedParcels = parcels.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [selectedParcelForEdit, setSelectedParcelForEdit] = useState<Parcel>({
+    id: 0,
+    trackingId: '',
+    senderName: '',
+    senderId: 0,
+    receiverName: '',
+    receiverId: 0,
+    status: 'Pending',
+    weight: 0,
+    createdAt: '',
+    senderLocation: '',
+    destination: ''
+  })
+  // const paginatedParcels = parcels.slice(
+  //   (currentPage - 1) * itemsPerPage,
+  //   currentPage * itemsPerPage
+  // );
+
+  useEffect(() => {
+    const loadParcels = async () => {
+      try {
+        const data = await getAllParcels()
+        setParcels(data.parcels)
+        console.log(data.parcels)
+      } catch (error: unknown) {
+        toast({ 
+          title: "Error", 
+          description: `Failed to load parcels: ${error instanceof Error ? error.message : 'Unknown error'}`, 
+          variant: "destructive" 
+        })
+      }
+    }
+    loadParcels()
+  }, [])
+
+  const handleStatusUpdate = async (parcelId: number, newStatus: string) => {
+    try {
+      await updateParcelStatus(parcelId, newStatus)
+      setParcels(prev => prev.map(p => 
+        p.id === parcelId ? { ...p, status: newStatus } : p
+      ))
+      toast({ title: "Success", description: "Status updated successfully" })
+    } catch {
+      toast({ title: "Error", description: "Failed to update status", variant: "destructive" })
+    }
+  }
+
+  const handleDelete = async (parcelId: number) => {
+    try {
+      await softDeleteParcel(parcelId)
+      setParcels(prev => prev.filter(p => p.id !== parcelId))
+      toast({ title: "Success", description: "Parcel deleted successfully" })
+    } catch {
+      toast({ title: "Error", description: "Failed to delete parcel", variant: "destructive" })
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -55,45 +121,35 @@ export default function AllParcelsPage() {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Tracking ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Sender
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Recipient
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parcel ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sender</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Receiver</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Weight (kg)</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {paginatedParcels.map((parcel) => (
-                <tr key={parcel.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <Package className="h-5 w-5 text-gray-400 mr-2" />
-                      <span className="text-sm">{parcel.trackingId}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{parcel.sender}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">{parcel.recipient}</td>
+              {parcels.map(parcel => (
+                <tr 
+                  key={parcel.id} 
+                  className="hover:bg-gray-50 cursor-pointer"
+                  onClick={() => {
+                    setSelectedParcel(parcel)
+                    setIsActionModalOpen(true)
+                  }}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap">{parcel.trackingId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{parcel.senderName}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">{parcel.receiverName}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                       {parcel.status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {parcel.date}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{parcel.weight}</td>
                 </tr>
               ))}
             </tbody>
@@ -125,6 +181,36 @@ export default function AllParcelsPage() {
           </div>
         </div>
       </div>
+
+      {selectedParcel && (
+        <>
+          <ParcelActionsModal
+            parcel={selectedParcel}
+            isOpen={isActionModalOpen}
+            onClose={() => setIsActionModalOpen(false)}
+            onStatusChange={(newStatus) => handleStatusUpdate(selectedParcel.id, newStatus)}
+            onDelete={() => handleDelete(selectedParcel.id)}
+            onEdit={() => {
+              setSelectedParcelForEdit(selectedParcel)
+              setEditModalOpen(true)
+              setIsActionModalOpen(false)
+            }}
+          />
+          
+          {selectedParcelForEdit && (
+            <EditParcelModal
+              isOpen={editModalOpen}
+              onClose={() => setEditModalOpen(false)}
+              parcel={selectedParcelForEdit}
+              onParcelUpdated={(updatedParcel: Parcel) => {
+                setParcels(prev => prev.map(p => 
+                  p.id === updatedParcel.id ? updatedParcel : p
+                ))
+              }}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }

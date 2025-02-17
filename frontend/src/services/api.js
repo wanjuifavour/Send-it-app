@@ -42,14 +42,25 @@ export const createParcel = async (parcelData) => {
     return response.data
 }
 
-export const getAllParcels = async () => {
-    const response = await api.get("/admin/parcels")
+export const getAllParcels = async (params = {}) => {
+    const response = await api.get("/parcels/all", {
+        params
+    })
     return response.data
 }
 
 export const updateParcelStatus = async (parcelId, status) => {
-    const response = await api.put(`/admin/parcels/${parcelId}/status`, { status })
+    const response = await api.put(`/parcels/${parcelId}/status`, { status })
     return response.data
+}
+
+export const softDeleteParcel = async (parcelId) => {
+    const response = await api.delete(`/parcels/${parcelId}`)
+    return response.data
+}
+
+export const upsertParcel = async (parcelData) => {
+    return api.post(`/parcels/upsert`, parcelData)
 }
 
 export const getLocations = async () => {
@@ -62,5 +73,10 @@ export const getUsers = async () => {
     // console.log('API Response:', response.data)
     return response.data
 };
+
+export const deleteUser = async (userId) => {
+    const response = await api.delete(`/users/${userId}`)
+    return response.data
+}
 
 export default api
