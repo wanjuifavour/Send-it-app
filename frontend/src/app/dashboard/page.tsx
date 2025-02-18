@@ -70,19 +70,19 @@ export default function DashboardPage() {
             <StatsCard
               title="Pending"
               value={parcels.filter(p => p.status === 'Pending').length.toString()}
-              label="Active"
+              label="Parcels not shipped "
               icon={<History className="h-6 w-6 text-white" />}
             />
             <StatsCard
               title="In Transit"
               value={parcels.filter(p => p.status === 'In Transit').length.toString()}
-              label="Active"
+              label="Parcels shipped"
               icon={<Truck className="h-6 w-6 text-white" />}
             />
             <StatsCard
               title="Delivered"
               value={parcels.filter(p => p.status === 'Delivered').length.toString()}
-              change="+12.8%"
+              change="Total parcels delivered"
               icon={<CheckCircle className="h-6 w-6 text-white" />}
             />
           </>
