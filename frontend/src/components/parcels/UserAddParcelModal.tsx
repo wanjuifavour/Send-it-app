@@ -18,7 +18,7 @@ interface UserAddParcelModalProps {
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "")
 
 function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParcelCreated: () => void }) {
-    const [locations, setLocations] = useState<string[]>([])
+    const [locations, setLocations] = useState<Array<{ name: string }>>([])
     const [loading, setLoading] = useState(false)
     const [formData, setFormData] = useState({
         receiverName: "",
@@ -62,21 +62,21 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         if (!stripe || !elements) {
             throw new Error("Stripe not initialized");
         }
-        
-        if (!locations.includes(formData.senderLocation)) {
+
+        if (!locations.some(loc => loc.name === formData.senderLocation)) {
             toast({ title: "Error", description: "Invalid sender location", variant: "destructive" });
             return;
         }
 
-        if (!locations.includes(formData.destination)) {
+        if (!locations.some(loc => loc.name === formData.senderLocation)) {
             toast({ title: "Error", description: "Invalid destination", variant: "destructive" });
             return;
         }
-        
+
         try {
             const parcelData = {
                 ...formData,
@@ -117,8 +117,8 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
             });
 
             if (error) throw error;
-            
-            toast({ title: "Success", description: `Payment of KES ${paymentIntentData.amount/100} successful! Parcel created.` });
+
+            toast({ title: "Success", description: `Payment of KES ${paymentIntentData.amount / 100} successful! Parcel created.` });
             onParcelCreated();
             onClose();
         } catch (error) {
@@ -176,15 +176,16 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                 <select
                     value={formData.senderLocation}
                     onChange={(e) => setFormData({ ...formData, senderLocation: e.target.value })}
+                    className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
                     required
                 >
+                    <option value="">Select your location</option>
                     {locations.length > 0 ? (
                         locations.map((location) => (
-                            <option key={location} value={location}>
-                                {location}
+                            <option key={location.name} value={location.name}>
+                                {location.name}
                             </option>
-                        ))
-                    ) : (
+                        ))) : (
                         <option disabled>Loading locations...</option>
                     )}
                 </select>
@@ -198,10 +199,10 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
                     required
                 >
-                    <option value="">Select destination</option>
+                    <option value="">Choose destination</option>
                     {locations.map((location) => (
-                        <option key={location} value={location}>
-                            {location}
+                        <option key={location.name} value={location.name}>
+                            {location.name}
                         </option>
                     ))}
                 </select>
