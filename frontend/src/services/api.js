@@ -88,9 +88,9 @@ export const deleteUser = async (userId) => {
     return response.data
 }
 
-export const createStripeSession = async (parcelData) => {
-    const response = await api.post('/create-stripe-session', parcelData);
+export const createPaymentIntent = async (parcelData) => {
+    const response = await api.post("/pay/payment-intent", { parcelData });
     return response.data;
-};
+}
 
 export default api

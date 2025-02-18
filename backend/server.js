@@ -8,6 +8,7 @@ const locationRoutes = require('./routes/locationRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const locationRoutes = require("./routes/locationRoutes")
 const smsRoutes = require("./routes/smsRoutes");
+const paymentRoutes = require("./routes/paymentRoutes")
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ const createServer = async () => {
 app.use('/api/users', userRoutes);
 app.use('/api/parcels', parcelRoutes);
 app.use("/api/locations", locationRoutes)
+app.use("/api/pay", paymentRoutes)
 
     app.get('/', (req, res) => {
         res.send('Welcome to Send-It API');

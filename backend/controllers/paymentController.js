@@ -1,27 +1,50 @@
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const { calculateDistance } = require("../services/distanceCalculator");
+
+exports.createPaymentIntent = async (req, res) => {
+    try {
+        const { parcelData } = req.body;
+        
+        const distance = await calculateDistance(
+            parcelData.senderLocation.trim().toLowerCase(), 
+            parcelData.destination.trim().toLowerCase()
+        );
+        const amount = Math.round(distance * process.env.PRICE_PER_KM * 100);
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: 'kes',
+            metadata: { parcelData: JSON.stringify(parcelData) }
+        });
+
+        res.json({ 
+            clientSecret: paymentIntent.client_secret,
+            amount
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+}
+
 exports.handleStripeWebhook = async (req, res) => {
     const sig = req.headers['stripe-signature'];
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const event = stripe.webhooks.constructEvent(
+        req.body,
+        sig,
+        process.env.STRIPE_WEBHOOK_SECRET
+    );
 
-    try {
-        const event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+    if (event.type === 'payment_intent.succeeded') {
+        const paymentIntent = event.data.object;
+        const parcelData = JSON.parse(paymentIntent.metadata.parcelData);
 
-        if (event.type === 'checkout.session.completed') {
-            const session = event.data.object;
-            
-            // Retrieve parcel data from metadata
-            const parcelData = JSON.parse(session.metadata.parcel);
-            
-            // Create the parcel
-            await executeStoredProcedure("sp_UpsertParcel", {
-                ...parcelData,
-                stripePaymentId: session.id,
-                status: 'Pending'
-            });
-        }
-
-        res.status(200).end();
-    } catch (err) {
-        console.error('Webhook Error:', err);
-        res.status(400).send(`Webhook Error: ${err.message}`);
+        // Create parcel in your database
+        await executeStoredProcedure("sp_CreateParcel", {
+            ...parcelData,
+            stripePaymentId: paymentIntent.id,
+            status: 'Pending'
+        });
     }
-}; 
+
+    res.json({ received: true });
+}

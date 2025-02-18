@@ -13,44 +13,15 @@ exports.getAllLocations = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: "Error fetching locations", error: error.message })
     }
-} 
-
-exports.addLocation = async (req, res) => {
-    const { name, latitude, longitude } = req.body;
-    
-    if (!name || !latitude || !longitude) {
-        return res.status(400).json({ message: "All location fields are required" });
-    }
-
-    try {
-        await executeStoredProcedure("sp_AddLocation", {
-            name: name.trim(),
-            latitude: parseFloat(latitude),
-            longitude: parseFloat(longitude)
-        });
-        res.status(201).json({ message: "Location added successfully" });
-    } catch (error) {
-        res.status(400).json({ 
-            message: error.message || "Error adding location",
-            error: error.originalError?.info?.message 
-        });
-    }
-};
+}
 
 exports.getLocationCoordinates = async (req, res) => {
-    const { name } = req.query;
-    
+    const locationName = req.body.locationName
     try {
-        const result = await executeStoredProcedure("sp_GetLocationCoordinates", {
-            locationName: name
-        });
-        
-        if (result.recordset.length > 0) {
-            res.json(result.recordset[0]);
-        } else {
-            res.status(404).json({ error: "Location not found" });
-        }
+        const result = await executeStoredProcedure("sp_GetLocationCoordinates", { locationName })
+        const locationDetails = result.recordset[0]
+        res.json(locationDetails)
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: "Error fetching location details", error: error.message })
     }
-};
+}  

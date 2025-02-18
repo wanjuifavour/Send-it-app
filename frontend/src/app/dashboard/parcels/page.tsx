@@ -1,9 +1,16 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Package, ArrowUpDown } from 'lucide-react';
-import { useStore } from '@/store/useStore';
-import { getParcels } from '@/services/api';
-import { Parcel } from '@/app/dashboard/all-parcels/page';
+import { UserAddParcelModal } from '@/components/parcels/UserAddParcelModal';
+
+const parcels = [
+  { id: 1, tracking: 'PKG-198765', destination: 'Nyeri, NY', status: 'In Transit', lastUpdate: '2 hours ago' },
+  { id: 2, tracking: 'PKG-298765', destination: 'Nairobi, KE', status: 'Delivered', lastUpdate: '1 day ago' },
+  { id: 3, tracking: 'PKG-398765', destination: 'Mombasa, KE', status: 'In Transit', lastUpdate: '5 hours ago' },
+  { id: 4, tracking: 'PKG-498765', destination: 'Eldoret, KE', status: 'Delivered', lastUpdate: '3 days ago' },
+  { id: 5, tracking: 'PKG-598765', destination: 'Kisumu, KE', status: 'In Transit', lastUpdate: '6 hours ago' },
+  { id: 6, tracking: 'PKG-698765', destination: 'Nakuru, KE', status: 'Delivered', lastUpdate: '2 days ago' },
+];
 
 export default function ParcelsPage() {
   const { user } = useStore();
@@ -13,6 +20,7 @@ export default function ParcelsPage() {
   const [filter, setFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const filteredParcels = filter === 'All' ? parcels : parcels.filter(p => p.status === filter);
 
@@ -46,7 +54,10 @@ export default function ParcelsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold">My Parcels</h1>
-        <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
+        <button
+          className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
           Send New Parcel
         </button>
       </div>
@@ -136,6 +147,15 @@ export default function ParcelsPage() {
           </button>
         </div>
       </div>
+
+      <UserAddParcelModal 
+        isOpen={isCreateModalOpen} 
+        onClose={() => setIsCreateModalOpen(false)}
+        onParcelCreated={() => {
+          // Add logic to refresh parcels list
+          setIsCreateModalOpen(false);
+        }}
+      />
     </div>
   );
 }
