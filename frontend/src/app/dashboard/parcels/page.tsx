@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Package, ArrowUpDown } from 'lucide-react';
+import { useStore } from '@/store/useStore';
+import { getParcels } from '@/services/api';
+import { Parcel } from '@/app/dashboard/all-parcels/page';
 import { UserAddParcelModal } from '@/components/parcels/UserAddParcelModal';
 
 const parcels = [
