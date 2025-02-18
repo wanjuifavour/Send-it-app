@@ -7,6 +7,7 @@ const parcelRoutes = require('./routes/parcelRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const locationRoutes = require("./routes/locationRoutes")
 const paymentRoutes = require("./routes/paymentRoutes")
+const smsRoutes = require("./routes/smsRoutes")
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/parcels', parcelRoutes);
 app.use("/api/locations", locationRoutes)
 app.use("/api/pay", paymentRoutes)
+app.use("/api/sms", smsRoutes);
 
 app.get('/', (req, res) => {
     res.send('Welcome to Send-It API');
@@ -37,4 +39,3 @@ const PORT = process.env.PORT || 8085;
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-app.use("/api/sms", smsRoutes);
