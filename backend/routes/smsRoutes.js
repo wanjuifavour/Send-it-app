@@ -1,7 +1,9 @@
-const express = require("express");
-const router = express.Router();
-const { notifyRecipient } = require("../controllers/smsController");
+const express = require('express');
+const { validateSmsRequest } = require('../middlewares/validation');
+const { handleSendSMS } = require('../controllers/smsController');
 
-router.post("/notify", notifyRecipient);
+const router = express.Router();
+
+router.post('/send', validateSmsRequest, handleSendSMS);
 
 module.exports = router;

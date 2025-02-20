@@ -42,3 +42,26 @@ exports.validateParcelCreation = (req, res, next) => {
 
     next()
 }
+
+exports.validateSmsRequest =(req, res, next) => {
+    const smsSchema = Joi.object({
+        receiverPhone: Joi.string()
+            .pattern(/^(?:254|\+254|0)?(7[0-9]{8})$/)
+            .required()
+            .messages({
+                'string.pattern.base': 'Phone number error. Please provide a valid phone number'
+            }),
+        receiverName: Joi.string().required(),
+        senderLocation: Joi.string().required(),
+        destination: Joi.string().required()
+    })
+
+    const { error } = smsSchema.validate(req.body);
+        if (error) {
+            return res.status(400).json({ 
+                success: false,
+                message: error.details[0].message 
+            });
+        }
+        next();
+}

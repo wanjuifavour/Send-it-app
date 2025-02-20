@@ -34,6 +34,8 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
         clientSecret: string;
         amount: number;
     } | null>(null);
+    const [showSmsConfirmation, setShowSmsConfirmation] = useState(false);
+    const [smsLoading, setSmsLoading] = useState(false);
 
     const { user } = useStore()
     const { toast } = useToast()
@@ -118,21 +120,57 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
 
             if (error) throw error;
 
-            toast({ title: "Success", description: `Payment of KES ${paymentIntentData.amount / 100} successful! Parcel created.` });
+            setShowConfirmation(false);
+            setShowSmsConfirmation(true);
+
+        } catch (error) {
+            let errorMessage = "Payment failed";
+            if (error instanceof Error) {
+                errorMessage = error.message;
+            } else if ((error as any).response?.data?.message) {
+                errorMessage = (error as any).response.data.message;
+            }
+
+            toast({
+                title: "Error",
+                description: errorMessage,
+                variant: "destructive"
+            });
+            setShowConfirmation(false);
+        }
+    }
+
+    const handleSendSmsConfirmation = async (sendSms: boolean) => {
+        if (!sendSms) {
             onParcelCreated();
             onClose();
+            toast({ title: "Success", description: `Payment of KES ${paymentIntentData!.amount / 100} successful!` });
+            return;
+        }
+
+        try {
+            setSmsLoading(true);
+            await api.post("/sms/send", {
+                receiverName: formData.receiverName,
+                receiverPhone: formData.receiverPhone,
+                senderLocation: formData.senderLocation,
+                destination: formData.destination
+            });
+
+            toast({
+                title: "Success",
+                description: `Payment successful and receiver notified!`
+            });
         } catch (error) {
-            if (error instanceof Error) {
-                if (error instanceof Error) {
-                    toast({ title: "Error", description: error.message, variant: "destructive" });
-                } else {
-                    toast({ title: "Error", description: "An unknown error occurred", variant: "destructive" });
-                }
-            } else {
-                toast({ title: "Error", description: "An unknown error occurred", variant: "destructive" });
-            }
+            toast({
+                title: "Error",
+                description: "Payment processed but failed to send notification",
+                variant: "destructive"
+            });
         } finally {
-            setShowConfirmation(false);
+            setSmsLoading(false);
+            onParcelCreated();
+            onClose();
         }
     }
 
@@ -226,6 +264,15 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                 <CardElement className="border p-2 rounded" />
             </div>
 
+            {!showConfirmation && !showSmsConfirmation && (
+                <button
+                    type="submit"
+                    className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700"
+                >
+                    Proceed to Payment
+                </button>
+            )}
+
             {showConfirmation && calculatedAmount && (
                 <div className="bg-blue-50 p-4 rounded-lg mb-4">
                     <div className="flex justify-between items-center">
@@ -253,12 +300,39 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                 </div>
             )}
 
-            <button
-                type="submit"
-                className="w-full bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700"
-            >
-                Proceed to Payment
-            </button>
+            {showSmsConfirmation && (
+                <div className="bg-blue-50 p-4 rounded-lg mb-4">
+                    <div className="flex flex-col space-y-4">
+                        <h3 className="font-medium">Payment Successful. Send notification?</h3>
+                        <p className="text-sm">Would you like to notify the receiver via SMS?</p>
+                        <div className="flex space-x-2 justify-end">
+                            <button
+                                type="button"
+                                onClick={() => handleSendSmsConfirmation(false)}
+                                className="px-4 py-2 text-sm border rounded-lg"
+                            >
+                                No Thanks
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => handleSendSmsConfirmation(true)}
+                                className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 flex items-center"
+                                disabled={smsLoading}
+                            >
+                                {smsLoading ? (
+                                    <>
+                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        Sending...
+                                    </>
+                                ) : 'Yes, Notify Receiver'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </form>
     )
 }
@@ -287,3 +361,4 @@ export function UserAddParcelModal({ isOpen, onClose, onParcelCreated }: UserAdd
         </div>
     )
 }
+

@@ -1,31 +1,37 @@
-const africastalking = require('africastalking');
+const africastalking = require("africastalking");
 
 const at = africastalking({
     apiKey: process.env.AT_API_KEY,
     username: process.env.AT_USERNAME
 });
 
-const sms = at.SMS;
+const formatPhoneNumber = (phoneNumber) => {
+    let cleaned = phoneNumber.replace(/\D/g, "");
+    
+    if (cleaned.startsWith("0")) {
+        return `+254${cleaned.substring(1)}`;
+    }
+    if (cleaned.startsWith("7")) {
+        return `+254${cleaned}`;
+    }
+    if (cleaned.startsWith("254")) {
+        return `+${cleaned}`;
+    }
+    return cleaned;
+};
 
-/**
- * Send SMS to a recipient
- * @param {string} phoneNumber
- * @param {string} message
- */
-
-const sendSMS = async (phoneNumber, message) => {
+exports.sendSMS = async (phone, message) => {
     try {
-        const response = await sms.send({
-            to: [`${phoneNumber}`],
+        const formattedPhone = formatPhoneNumber(phone);
+        const sms = at.SMS;
+        
+        return await sms.send({
+            to: [formattedPhone],
             message: message,
-            from: process.env.AT_SENDER_ID
+            from: process.env.AT_SENDER_ID || ""
         });
-        console.log("SMS sent successfully:", response);
-        return response;
     } catch (error) {
-        console.error("Error sending SMS:", error);
+        console.error("SMS Sending Error:", error);
         throw error;
     }
 };
-
-module.exports = { sendSMS };
