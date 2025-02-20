@@ -4,7 +4,7 @@ const { calculateDistance } = require("../services/distanceCalculator");
 exports.createPaymentIntent = async (req, res) => {
     try {
         const { parcelData } = req.body;
-        
+
         const distance = await calculateDistance(
             parcelData.senderLocation.trim().toLowerCase(), 
             parcelData.destination.trim().toLowerCase()
@@ -22,7 +22,12 @@ exports.createPaymentIntent = async (req, res) => {
             amount
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ 
+            error: {
+                message: error.message,
+                status: 500
+            }
+        });
     }
 }
 

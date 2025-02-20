@@ -43,25 +43,49 @@ exports.validateParcelCreation = (req, res, next) => {
     next()
 }
 
-exports.validateSmsRequest =(req, res, next) => {
-    const smsSchema = Joi.object({
-        receiverPhone: Joi.string()
-            .pattern(/^(?:254|\+254|0)?(7[0-9]{8})$/)
-            .required()
-            .messages({
-                'string.pattern.base': 'Phone number error. Please provide a valid phone number'
-            }),
-        receiverName: Joi.string().required(),
-        senderLocation: Joi.string().required(),
-        destination: Joi.string().required()
-    })
+exports.validateUserParcelCreation = (req, res, next) => {
+    const parcelSchema = Joi.object({
+        receiverName: Joi.string()
+        .required()
+        .min(2)
+        .max(50)
+        .message('Check receiver name')
+        .label('Receiver name'),
 
-    const { error } = smsSchema.validate(req.body);
-        if (error) {
-            return res.status(400).json({ 
-                success: false,
-                message: error.details[0].message 
-            });
-        }
-        next();
+        receiverEmail: Joi.string()
+        .required()
+        .email()
+        .message('Invalid email'),
+
+        receiverPhone: Joi.string()
+            .required()
+            .pattern(/^(?:254|\+254|0)?(7[0-9]{8})$/)
+            .message('Invalid phone number')
+            .label("Receiver's phone number"),
+
+        senderLocation: Joi.string()
+        .required()
+        .label('Sender location'),
+
+        destination: Joi.string()
+        .required()
+        .disallow(Joi.ref('senderLocation'))
+        .label('Destination'),
+
+        weight: Joi.number()
+        .required()
+        .positive()
+        .precision(2)
+    });
+    
+    const { error } = parcelSchema.validate(req.body.parcelData);
+    if (error) {
+        return res.status(400).json({ 
+            error: {
+                message: error.message,
+                status: 400
+            }
+        });
+    }
+    next();
 }

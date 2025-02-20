@@ -64,43 +64,36 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (!stripe || !elements) {
-            throw new Error("Stripe not initialized");
-        }
-
-        if (!locations.some(loc => loc.name === formData.senderLocation)) {
-            toast({ title: "Error", description: "Invalid sender location", variant: "destructive" });
-            return;
-        }
-
-        if (!locations.some(loc => loc.name === formData.senderLocation)) {
-            toast({ title: "Error", description: "Invalid destination", variant: "destructive" });
-            return;
-        }
+        if (!stripe || !elements) return;
 
         try {
-            const parcelData = {
-                ...formData,
-                weight: parseFloat(formData.weight),
-                senderId: user?.id
-            };
-
-            const { data } = await api.post("/pay/payment-intent", { parcelData });
+            const { data } = await api.post("/pay/payment-intent", {
+                parcelData: {
+                    ...formData,
+                    weight: parseFloat(formData.weight),
+                }
+            });
             setCalculatedAmount(data.amount);
             setPaymentIntentData(data);
             setShowConfirmation(true);
-
-        } catch (error) {
-            if (error instanceof Error) {
-                if (error instanceof Error) {
-                    toast({ title: "Error", description: error.message, variant: "destructive" });
-                } else {
-                    toast({ title: "Error", description: "An unknown error occurred", variant: "destructive" });
-                }
-            } else {
-                toast({ title: "Error", description: "An unknown error occurred", variant: "destructive" });
+        } catch (error: any) {
+            let errorMessage = "An unknown error occurred";
+            
+            if (error.response?.data?.error?.message) {
+                errorMessage = error.response.data.error.message;
+            } 
+            else if (error.response?.status === 400) {
+                errorMessage = error.response.data.message || "Invalid Inputs";
             }
+            else if (error.message) {
+                errorMessage = error.message;
+            }
+        
+            toast({
+                title: "Error",
+                description: errorMessage,
+                variant: "destructive"
+            });
         }
     }
 
@@ -183,18 +176,16 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                     value={formData.receiverName}
                     onChange={(e) => setFormData({ ...formData, receiverName: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    required
                 />
             </div>
 
             <div>
                 <label className="block text-sm font-medium text-gray-700">Receiver Email</label>
                 <input
-                    type="email"
+                    type="text"
                     value={formData.receiverEmail}
                     onChange={(e) => setFormData({ ...formData, receiverEmail: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    required
                 />
             </div>
 
@@ -205,7 +196,6 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                     value={formData.receiverPhone}
                     onChange={(e) => setFormData({ ...formData, receiverPhone: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    required
                 />
             </div>
 
@@ -215,7 +205,6 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                     value={formData.senderLocation}
                     onChange={(e) => setFormData({ ...formData, senderLocation: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    required
                 >
                     <option value="">Select your location</option>
                     {locations.length > 0 ? (
@@ -235,7 +224,6 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                     value={formData.destination}
                     onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    required
                 >
                     <option value="">Choose destination</option>
                     {locations.map((location) => (
@@ -253,7 +241,6 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
                     value={formData.weight}
                     onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2"
-                    required
                     step="0.1"
                     min="0"
                 />
