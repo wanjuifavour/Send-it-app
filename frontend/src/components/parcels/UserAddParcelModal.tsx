@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import { X } from "lucide-react"
 import { useStore } from "@/store/useStore"
 import { useToast } from "@/hooks/use-toast"
-import api from "@/services/api"
-import { getLocations } from "@/services/api"
+import api, { getLocations, sendSMS, createPaymentIntent, userCreateParcel } from "@/services/api"
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { loadStripe, StripeCardElement } from '@stripe/stripe-js'
 
@@ -33,6 +32,7 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
     const [paymentIntentData, setPaymentIntentData] = useState<{
         clientSecret: string;
         amount: number;
+        id: string;
     } | null>(null);
     const [showSmsConfirmation, setShowSmsConfirmation] = useState(false);
     const [smsLoading, setSmsLoading] = useState(false);
@@ -67,12 +67,7 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
         if (!stripe || !elements) return;
 
         try {
-            const { data } = await api.post("/pay/payment-intent", {
-                parcelData: {
-                    ...formData,
-                    weight: parseFloat(formData.weight),
-                }
-            });
+            const { data } = await createPaymentIntent(formData)
             setCalculatedAmount(data.amount);
             setPaymentIntentData(data);
             setShowConfirmation(true);
@@ -113,6 +108,16 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
 
             if (error) throw error;
 
+            const parcelData = {
+                ...formData,
+                stripePaymentId: paymentIntentData.id,
+                amount: (paymentIntentData.amount) / 100,
+                weight: parseFloat(formData.weight),
+                senderId: user?.id
+            }
+
+            await userCreateParcel(parcelData)
+
             setShowConfirmation(false);
             setShowSmsConfirmation(true);
 
@@ -143,12 +148,7 @@ function ParcelForm({ onClose, onParcelCreated }: { onClose: () => void; onParce
 
         try {
             setSmsLoading(true);
-            await api.post("/sms/send", {
-                receiverName: formData.receiverName,
-                receiverPhone: formData.receiverPhone,
-                senderLocation: formData.senderLocation,
-                destination: formData.destination
-            });
+            await sendSMS(formData)
 
             toast({
                 title: "Success",

@@ -88,9 +88,29 @@ export const deleteUser = async (userId) => {
     return response.data
 }
 
-export const createPaymentIntent = async (parcelData) => {
-    const response = await api.post("/pay/payment-intent", { parcelData });
+export const createPaymentIntent = async (formData) => {
+    const response = await api.post("/pay/payment-intent", {
+        parcelData: {
+            ...formData,
+            weight: parseFloat(formData.weight)
+        } 
+    }); 
+    return response;
+}
+
+export const userCreateParcel = async (parcelData) => {
+    const response = await api.post("/parcels/user/create", parcelData);
     return response.data;
 }
+
+export const sendSMS = async (formData) => {
+    const response = await api.post("/sms/send", {
+        receiverName: formData.receiverName,
+        receiverPhone: formData.receiverPhone,
+        senderLocation: formData.senderLocation,
+        destination: formData.destination
+    });
+    return response.data;
+};
 
 export default api

@@ -19,7 +19,8 @@ exports.createPaymentIntent = async (req, res) => {
 
         res.json({ 
             clientSecret: paymentIntent.client_secret,
-            amount
+            amount,
+            id: paymentIntent.id 
         });
     } catch (error) {
         res.status(500).json({ 

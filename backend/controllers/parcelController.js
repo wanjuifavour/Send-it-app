@@ -134,3 +134,26 @@ exports.getParcelById = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+exports.userCreateParcel = async (req, res) => {
+    const { receiverName, receiverEmail, receiverPhone, senderLocation, destination, weight, stripePaymentId, senderId, amount } = req.body;
+
+    try {
+        const result = await executeStoredProcedure("sp_CreateUserParcel", {
+            senderId,
+            receiverName,
+            receiverEmail,
+            receiverPhone,
+            senderLocation,
+            destination,
+            weight: parseFloat(weight),
+            stripePaymentId,
+            amount,
+        });
+
+        const parcelId = result.recordset[0].id;
+        res.status(201).json({ message: "Parcel created successfully", parcelId });
+    } catch (error) {
+        res.status(500).json({ message: "Error creating parcel", error: error.message });
+    }
+};
