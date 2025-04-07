@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { BarChart, Package, Map, Users, Truck, Settings } from 'lucide-react';
+import { BarChart, Package, Map, Users, Truck, Settings, MapPin } from 'lucide-react';
 import { useStore } from "@/store/useStore";
 
 interface SidebarProps {
@@ -79,7 +79,11 @@ export function Sidebar({ onClose }: SidebarProps) {
                 </Link>
                 <Link href="/dashboard/all-parcels" onClick={handleLinkClick} className={getLinkClass('/dashboard/all-parcels')}>
                   <Package className="h-5 w-5 mr-3" />
-                  All Parcels
+                  Manage Parcels
+                </Link>
+                <Link href="/dashboard/locations" onClick={handleLinkClick} className={getLinkClass('/dashboard/locations')}>
+                  <MapPin className="h-5 w-5 mr-3" />
+                  Manage locations
                 </Link>
                 <Link href="/dashboard/delivery" onClick={handleLinkClick} className={getLinkClass('/dashboard/delivery')}>
                   <Truck className="h-5 w-5 mr-3" />

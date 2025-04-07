@@ -12,6 +12,13 @@ interface User {
   email: string;
 }
 
+// interface Location {
+//   id: number;
+//   name: string;
+//   latitude: number;
+//   longitude: number;
+// }
+
 interface AddParcelModalProps {
   isOpen: boolean
   onClose: () => void
@@ -19,7 +26,7 @@ interface AddParcelModalProps {
 
 export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
   const modalRef = useRef<HTMLDivElement>(null)
-  const [locations, setLocations] = useState<string[]>([])
+  const [locations, setLocations] = useState<{ name: string }[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -80,10 +87,13 @@ export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
 
   const filteredLocations = (searchTerm: string) => {
     if (!locations) return [];
-    return locations.filter(location =>
-      location?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }
+    return locations.filter((location) => {
+        if (location && typeof location === 'object' && location.name) {
+            return location.name.toLowerCase().includes(searchTerm.toLowerCase());
+        }
+        return false;
+    });
+};
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -183,8 +193,8 @@ export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
                 >
                   <option value="">Select a sender location</option>
                   {filteredLocations(formData.senderLocation).map((location) => (
-                    <option key={location} value={location}>
-                      {location}
+                    <option key={location.name} value={location.name}>
+                      {location.name}
                     </option>
                   ))}
                 </select>
@@ -202,8 +212,8 @@ export function AddParcelModal({ isOpen, onClose }: AddParcelModalProps) {
                 >
                   <option value="">Select a destination</option>
                   {filteredLocations(formData.destination).map((location) => (
-                    <option key={location} value={location}>
-                      {location}
+                    <option key={location.name} value={location.name}>
+                      {location.name}
                     </option>
                   ))}
                 </select>

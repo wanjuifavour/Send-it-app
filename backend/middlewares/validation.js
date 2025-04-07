@@ -42,3 +42,50 @@ exports.validateParcelCreation = (req, res, next) => {
 
     next()
 }
+
+exports.validateUserParcelCreation = (req, res, next) => {
+    const parcelSchema = Joi.object({
+        receiverName: Joi.string()
+        .required()
+        .min(2)
+        .max(50)
+        .message('Check receiver name')
+        .label('Receiver name'),
+
+        receiverEmail: Joi.string()
+        .required()
+        .email()
+        .message('Invalid email'),
+
+        receiverPhone: Joi.string()
+            .required()
+            .pattern(/^(?:254|\+254|0)?(7[0-9]{8})$/)
+            .message('Invalid phone number')
+            .label("Receiver's phone number"),
+
+        senderLocation: Joi.string()
+        .required()
+        .label('Sender location'),
+
+        destination: Joi.string()
+        .required()
+        .disallow(Joi.ref('senderLocation'))
+        .label('Destination'),
+
+        weight: Joi.number()
+        .required()
+        .positive()
+        .precision(2)
+    });
+    
+    const { error } = parcelSchema.validate(req.body.parcelData);
+    if (error) {
+        return res.status(400).json({ 
+            error: {
+                message: error.message,
+                status: 400
+            }
+        });
+    }
+    next();
+}

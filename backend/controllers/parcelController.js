@@ -1,4 +1,5 @@
 const { executeStoredProcedure } = require("../config/database")
+const { sendSMS } = require("../services/smsService");
 
 exports.upsertParcel = async (req, res) => {
     const { id, senderId, receiverId, senderLocation, destination, weight } = req.body
@@ -17,6 +18,13 @@ exports.upsertParcel = async (req, res) => {
         const parcelId = result.recordset[0].id
         const message = id ? "Parcel updated successfully" : "Parcel created successfully"
 
+        const receiverResult = await executeStoredProcedure("sp_GetUserById", { id: receiverId });
+        const receiverPhone = receiverResult.recordset[0].phone;
+
+        if (receiverPhone) {
+            await sendSMS(receiverPhone, `Hello! A parcel (ID: ${parcelId}) has been sent to you. Track it on Send-It.`);
+        }
+        
         res.status(id ? 200 : 201).json({ message, parcelId })
     } catch (error) {
         res.status(500).json({ message: "Error upserting parcel", error: error.message })
@@ -62,6 +70,8 @@ exports.updateParcelStatus = async (req, res) => {
 exports.getParcels = async (req, res) => {
     try {
         const result = await executeStoredProcedure("sp_GetParcelsByUser", {
+            page: 1,
+            pageSize: 100,
             userId: req.userData.userId
         })
         res.json(result.recordset)
@@ -106,3 +116,44 @@ exports.getAllParcels = async (req, res) => {
         res.status(500).json({ message: "Error fetching parcels", error: error.message })
     }
 }
+
+exports.getParcelById = async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+        const result = await executeStoredProcedure("sp_GetParcelById", {
+            id: parseInt(id)
+        });
+        
+        if (result.recordset.length > 0) {
+            res.json(result.recordset[0]);
+        } else {
+            res.status(404).json({ error: "Parcel not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+exports.userCreateParcel = async (req, res) => {
+    const { receiverName, receiverEmail, receiverPhone, senderLocation, destination, weight, stripePaymentId, senderId, amount } = req.body;
+
+    try {
+        const result = await executeStoredProcedure("sp_CreateUserParcel", {
+            senderId,
+            receiverName,
+            receiverEmail,
+            receiverPhone,
+            senderLocation,
+            destination,
+            weight: parseFloat(weight),
+            stripePaymentId,
+            amount,
+        });
+
+        const parcelId = result.recordset[0].id;
+        res.status(201).json({ message: "Parcel created successfully", parcelId });
+    } catch (error) {
+        res.status(500).json({ message: "Error creating parcel", error: error.message });
+    }
+};

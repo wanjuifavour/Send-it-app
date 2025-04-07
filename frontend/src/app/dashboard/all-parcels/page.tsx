@@ -18,6 +18,7 @@ export interface Parcel {
   status: string
   weight: number
   createdAt: string
+  updatedAt: string,
   senderLocation: string
   destination: string
 }
@@ -44,7 +45,8 @@ export default function AllParcelsPage() {
     weight: 0,
     createdAt: '',
     senderLocation: '',
-    destination: ''
+    destination: '',
+    updatedAt: ''
   })
   // const paginatedParcels = parcels.slice(
   //   (currentPage - 1) * itemsPerPage,
@@ -206,6 +208,7 @@ export default function AllParcelsPage() {
                 setParcels(prev => prev.map(p => 
                   p.id === updatedParcel.id ? updatedParcel : p
                 ))
+                setEditModalOpen(false)
               }}
             />
           )}

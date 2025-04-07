@@ -63,6 +63,15 @@ export const upsertParcel = async (parcelData) => {
     return api.post(`/parcels/upsert`, parcelData)
 }
 
+export const addLocation = async (locationData) => {
+    try {
+        const response = await api.post(`/locations/add`, locationData);
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.message || "Failed to add location");
+    }
+};
+
 export const getLocations = async () => {
     const response = await api.get("/locations/get");
     return response.data;
@@ -78,5 +87,30 @@ export const deleteUser = async (userId) => {
     const response = await api.delete(`/users/${userId}`)
     return response.data
 }
+
+export const createPaymentIntent = async (formData) => {
+    const response = await api.post("/pay/payment-intent", {
+        parcelData: {
+            ...formData,
+            weight: parseFloat(formData.weight)
+        } 
+    }); 
+    return response;
+}
+
+export const userCreateParcel = async (parcelData) => {
+    const response = await api.post("/parcels/user/create", parcelData);
+    return response.data;
+}
+
+export const sendSMS = async (formData) => {
+    const response = await api.post("/sms/send", {
+        receiverName: formData.receiverName,
+        receiverPhone: formData.receiverPhone,
+        senderLocation: formData.senderLocation,
+        destination: formData.destination
+    });
+    return response.data;
+};
 
 export default api
