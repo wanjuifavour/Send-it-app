@@ -44,7 +44,7 @@ exports.handleStripeWebhook = async (req, res) => {
         const paymentIntent = event.data.object;
         const parcelData = JSON.parse(paymentIntent.metadata.parcelData);
 
-        // Create parcel in your database
+        // Create parcel in the database
         await executeStoredProcedure("sp_CreateParcel", {
             ...parcelData,
             stripePaymentId: paymentIntent.id,
